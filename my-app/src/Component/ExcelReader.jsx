@@ -1,127 +1,152 @@
 import React, { useEffect, useState } from "react";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import "./CSS/style.css";
 
 const ExcelReader = () => {
   const [excelData, setExcelData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [locationSearch, setLocationSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("/my-app/public/JobData.xlsx")
-      .then((response) => response.arrayBuffer())
-      .then((data) => {
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(sheet);
+    const fetchExcelData = async () => {
+      try {
+        const workbook = new ExcelJS.Workbook();
+        const response = await fetch("../../public/JobData.xlsx");
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch Excel file');
+        }
+        
+        const arrayBuffer = await response.arrayBuffer();
+        await workbook.xlsx.load(arrayBuffer);
+        const worksheet = workbook.worksheets[0];
+        
+        const jsonData = [];
+        
+        // Skip empty rows and process only rows with data
+        worksheet.eachRow((row, rowNumber) => {
+          if (rowNumber > 1) { // Skip header row
+            const rowData = {
+              slNo: row.getCell(1).value,
+              postingDate: row.getCell(2).value,
+              jobTitle: row.getCell(3).value,
+              location: row.getCell(4).value,
+              experience: row.getCell(5).value,
+              details: row.getCell(6).value
+            };
+            
+            // Only add rows that have at least a job title
+            if (rowData.jobTitle) {
+              jsonData.push(rowData);
+            }
+          }
+        });
+
+        console.log('Parsed Excel Data:', jsonData); // Debug log
         setExcelData(jsonData);
-      })
-      .catch((error) => console.error("Error loading Excel file:", error));
+        setLoading(false);
+      } catch (error) {
+        console.error("Error loading Excel file:", error);
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchExcelData();
   }, []);
 
   const handleSearch = (event) => {
-    setSearchTerm(event.target.value.toUpperCase());
+    setSearchTerm(event.target.value.toLowerCase());
   };
 
+  const handleLocationSearch = (event) => {
+    setLocationSearch(event.target.value.toLowerCase());
+  };
+
+  const filteredData = excelData.filter((row) => {
+    const matchesTitle = row.jobTitle?.toString().toLowerCase().includes(searchTerm);
+    const matchesLocation = row.location?.toString().toLowerCase().includes(locationSearch);
+    
+    if (!searchTerm && !locationSearch) return true;
+    if (!locationSearch) return matchesTitle;
+    if (!searchTerm) return matchesLocation;
+    return matchesTitle && matchesLocation;
+  });
+
   return (
-    <div style={{ backgroundColor: "white" }}>
-      {/* FontAwesome Icons */}
-      <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-      />
+    <div className="excel-reader-container">
+      <div className="content-wrapper">
+        {/* Heading Section */}
+        <div className="header-section">
+          <h1>
+            <span>Build Your </span>
+            <span className="highlight">career, </span>
+            <span>Empower Your </span>
+            <span className="highlight">future</span>
+          </h1>
 
-      <header>
-        <style>
-          {`
-          html, body {
-            overflow: hidden;
-          }
-          `}
-        </style>
-      </header>
+          {/* Search Section */}
+          <div className="search-section">
+            <input
+              type="text"
+              placeholder="Job title, keyword or company"
+              onChange={handleSearch}
+              value={searchTerm}
+            />
+            <input
+              type="text"
+              placeholder="Location"
+              onChange={handleLocationSearch}
+              value={locationSearch}
+            />
+            <button className="dropbtn">Search</button>
+          </div>
+        </div>
 
-      {/* Heading Section */}
-      <table border="0" width="70%">
-        <tbody>
-          <tr>
-            <td
-              style={{
-                fontFamily: "calibri",
-                fontSize: "48px",
-                color: "#0099cc",
-                fontWeight: "normal",
-                textAlign: "center",
-              }}
-            >
-              <p>
-                <span style={{ backgroundColor: "white" }}>Build Your</span>{" "}
-                <span style={{ color: "#336699" }}>career,&nbsp;</span>
-                <span style={{ backgroundColor: "white" }}>Empower Your </span>{" "}
-                <span style={{ color: "#336699" }}>future</span>
-              </p>
-
-              {/* Search Section */}
-              <p>
-                <input
-                  type="text"
-                  placeholder="Job title, keyword or company"
-                  onChange={handleSearch}
-                />{" "}
-                <input type="text" placeholder="Location" />
-                <button className="dropbtn">Search</button>
-              </p>
-
-              {/* Column Headers */}
-              <button className="dropbtn">Sl.no</button>
-              <button className="dropbtn">Job Title / Position</button>
-              <button className="dropbtn">Job Location</button>
-              <button className="dropbtn">No.of Years Exp</button>
-              <button className="dropbtn">Click for More Details</button>
-              <p></p>
-              <button className="dropbtn">
-                <i className="fa fa-arrow-right">&nbsp; Apply Now</i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      {/* Job Listings Table */}
-      <table border="1" width="70%" id="myTable">
-        <thead>
-          <tr>
-            <th>Sl.no</th>
-            <th>Job Title</th>
-            <th>Location</th>
-            <th>Experience</th>
-            <th>More Details</th>
-          </tr>
-        </thead>
-        <tbody>
-          {excelData.length > 0 ? (
-            excelData
-              .filter((row) => row["Job Title"]?.toUpperCase().includes(searchTerm))
-              .map((row, index) => (
+        {/* Job Listings Table */}
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Sl.no</th>
+              <th>Job Posting Date</th>
+              <th>Job Title / Position</th>
+              <th>Job Location</th>
+              <th>No.of Years Exp</th>
+              <th>Click for More Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan="6">Loading Excel data...</td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan="6">Error: {error}</td>
+              </tr>
+            ) : filteredData.length > 0 ? (
+              filteredData.map((row, index) => (
                 <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{row["Job Title"] || "N/A"}</td>
-                  <td>{row["Location"] || "N/A"}</td>
-                  <td>{row["Experience"] || "N/A"}</td>
+                  <td>{row.slNo}</td>
+                  <td>{row.postingDate}</td>
+                  <td>{row.jobTitle}</td>
+                  <td>{row.location}</td>
+                  <td>{row.experience}</td>
                   <td>
                     <button className="dropbtn">View Details</button>
                   </td>
                 </tr>
               ))
-          ) : (
-            <tr>
-              <td colSpan="5" style={{ textAlign: "center" }}>
-                Loading Excel data...
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            ) : (
+              <tr>
+                <td colSpan="6">No matching results found</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
