@@ -1,0 +1,112 @@
+.excel-reader-container {
+  padding: 20px;
+  background-color: white;
+  color: #333333; /* Default text color for the container */
+}
+
+.content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.header-section h1 {
+  font-family: 'Calibri', sans-serif;
+  font-size: 48px;
+  color: #0099cc; /* Header main text color */
+  margin-bottom: 20px;
+}
+
+.header-section .highlight {
+  color: #336699; /* Highlighted text color */
+}
+
+.search-section {
+  margin: 20px 0;
+}
+
+.search-section input {
+  padding: 10px;
+  margin: 0 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 200px;
+  color: #444444; /* Input text color */
+}
+
+.search-section input::placeholder {
+  color: #999999; /* Placeholder text color */
+}
+
+.dropbtn {
+  background-color: #0099cc;
+  color: white; /* Button text color */
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  margin: 5px;
+  border-radius: 4px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  color: #444444; /* Table text color */
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.data-table th {
+  background-color: #0099cc;
+  color: white; /* Table header text color */
+}
+
+.data-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+  color: #444444; /* Even row text color */
+}
+
+.data-table tr:hover {
+  background-color: #f5f5f5;
+  color: #000000; /* Text color on hover */
+}
+
+/* Additional text color styles */
+.data-table td button {
+  color: white; /* Button text color in table */
+}
+
+.data-table td a {
+  color: #0099cc; /* Link text color in table */
+  text-decoration: none;
+}
+
+.data-table td a:hover {
+  color: #007399; /* Link text color on hover */
+  text-decoration: underline;
+}
+
+/* Error message color */
+.error-message {
+  color: #ff0000;
+}
+
+/* Loading message color */
+.loading-message {
+  color: #666666;
+}
+
+/* No results message color */
+.no-results {
+  color: #666666;
+}
