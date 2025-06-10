@@ -20,7 +20,7 @@ const OCRProcessor: React.FC<OCRProcessorProps> = ({ file, onProcessingComplete 
 
   const processingSteps = [
     { title: 'Preprocessing Document', icon: Eye, desc: 'Enhancing image quality and removing noise' },
-    { title: 'Script Detection', icon: Languages, desc: 'Identifying language script (Tamil, English, etc.)' },
+    { title: 'Script Detection', icon: Languages, desc: 'Identifying language script (Tamil, English)' },
     { title: 'OCR Analysis', icon: FileText, desc: 'Extracting handwritten text using deep learning' },
     { title: 'Post-processing', icon: CheckCircle, desc: 'Cleaning and validating extracted content' }
   ];
@@ -32,15 +32,21 @@ const OCRProcessor: React.FC<OCRProcessorProps> = ({ file, onProcessingComplete 
         await new Promise(resolve => setTimeout(resolve, 1500));
       }
 
-      // Simulate OCR processing result
+      const isTamil = file.name.toLowerCase().includes('tamil');
+
       const mockResult: OCRResult = {
-        extractedText: file.name.includes('tamil') 
+        extractedText: isTamil
           ? 'இந்த ஆவணம் தமிழ் மொழியில் எழுதப்பட்டுள்ளது. வரலாற்று முக்கியத்துவம் வாய்ந்த இந்த பதிவு 1892 ஆம் ஆண்டைச் சேர்ந்தது. குடும்ப வம்சாவளி மற்றும் நில உரிமை பற்றிய விவரங்கள் இங்கே காணப்படுகின்றன.'
-          : 'This historical document contains valuable information about land ownership records from the late 19th century. The handwritten text mentions property boundaries, family lineage, and legal proceedings dated around 1892. Several signatures and official seals are visible throughout the document.',
-        detectedLanguage: file.name.includes('tamil') ? 'Tamil' : 'English',
+          : 'This historical document contains valuable information about land ownership records from the late 19th century. The handwritten text mentions property boundaries, family lineage, and legal proceedings dated around 1892.',
+        detectedLanguage: isTamil ? 'Tamil' : 'English',
         confidence: 0.94,
         processingTime: 6.2
       };
+
+      if (!['English', 'Tamil'].includes(mockResult.detectedLanguage)) {
+        alert('Only English and Tamil are supported.');
+        return;
+      }
 
       setResult(mockResult);
       setIsProcessing(false);
@@ -63,7 +69,7 @@ const OCRProcessor: React.FC<OCRProcessorProps> = ({ file, onProcessingComplete 
             const Icon = step.icon;
             const isActive = currentStep === index && isProcessing;
             const isCompleted = currentStep > index || !isProcessing;
-            
+
             return (
               <div key={index} className={`flex items-center space-x-4 p-4 rounded-lg transition-all ${
                 isActive ? 'bg-blue-50 border border-blue-200' : 
@@ -81,7 +87,7 @@ const OCRProcessor: React.FC<OCRProcessorProps> = ({ file, onProcessingComplete 
                     }`} />
                   )}
                 </div>
-                
+
                 <div className="flex-1">
                   <h3 className={`font-semibold ${
                     isActive ? 'text-blue-800' : 
@@ -97,9 +103,7 @@ const OCRProcessor: React.FC<OCRProcessorProps> = ({ file, onProcessingComplete 
                   </p>
                 </div>
 
-                {isCompleted && (
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                )}
+                {isCompleted && <CheckCircle className="w-5 h-5 text-green-500" />}
               </div>
             );
           })}
@@ -111,7 +115,7 @@ const OCRProcessor: React.FC<OCRProcessorProps> = ({ file, onProcessingComplete 
               <CheckCircle className="w-6 h-6 text-green-600" />
               <h3 className="text-lg font-semibold text-green-800">Processing Complete!</h3>
             </div>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
                 <span className="text-gray-600">Language:</span>

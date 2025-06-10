@@ -7,38 +7,31 @@ interface TranslationPanelProps {
 }
 
 const TranslationPanel: React.FC<TranslationPanelProps> = ({ originalText, sourceLanguage }) => {
-  const [targetLanguage, setTargetLanguage] = useState('English');
+  const [targetLanguage, setTargetLanguage] = useState(sourceLanguage === 'English' ? 'Tamil' : 'English');
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const languages = [
     { code: 'en', name: 'English' },
-    { code: 'hi', name: 'Hindi' },
-    { code: 'ta', name: 'Tamil' },
-    { code: 'te', name: 'Telugu' },
-    { code: 'ml', name: 'Malayalam' },
-    { code: 'kn', name: 'Kannada' }
+    { code: 'ta', name: 'Tamil' }
   ];
 
   useEffect(() => {
     if (originalText && targetLanguage !== sourceLanguage) {
       setIsTranslating(true);
       
-      // Simulate translation processing
       setTimeout(() => {
         let translation = '';
-        
+
         if (sourceLanguage === 'Tamil' && targetLanguage === 'English') {
           translation = 'This document is written in the Tamil language. This historically significant record dates back to 1892. Details about family genealogy and land ownership rights can be found here.';
-        } else if (sourceLanguage === 'English' && targetLanguage === 'Hindi') {
-          translation = 'यह ऐतिहासिक दस्तावेज़ 19वीं सदी के अंत से भूमि स्वामित्व रिकॉर्ड के बारे में मूल्यवान जानकारी रखता है। हस्तलिखित पाठ में संपत्ति की सीमाओं, पारिवारिक वंशावली और 1892 के आसपास दिनांकित कानूनी कार्यवाही का उल्लेख है।';
         } else if (sourceLanguage === 'English' && targetLanguage === 'Tamil') {
           translation = 'இந்த வரலாற்று ஆவணம் 19 ஆம் நூற்றாண்டின் பிற்பகுதியிலிருந்து நில உரிமை பதிவுகள் பற்றிய மதிப்புமிக்க தகவல்களைக் கொண்டுள்ளது. கையால் எழுதப்பட்ட உரையில் சொத்து எல்லைகள், குடும்ப வம்சாவளி மற்றும் 1892 ஆம் ஆண்டைச் சுற்றியுள்ள சட்ட நடவடிக்கைகள் குறிப்பிடப்பட்டுள்ளன.';
         } else {
-          translation = `[Translated from ${sourceLanguage} to ${targetLanguage}] ${originalText}`;
+          translation = 'Translation between selected languages is not supported.';
         }
-        
+
         setTranslatedText(translation);
         setIsTranslating(false);
       }, 2000);
@@ -96,7 +89,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({ originalText, sourc
                 </select>
               </div>
             </div>
-            
+
             <div className="h-64 p-4 bg-gradient-to-br from-teal-50 to-blue-50 border border-teal-200 rounded-lg overflow-y-auto relative">
               {isTranslating ? (
                 <div className="flex items-center justify-center h-full">
@@ -130,7 +123,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({ originalText, sourc
                     </>
                   )}
                 </button>
-                
+
                 <button className="flex items-center space-x-2 px-4 py-2 bg-teal-100 hover:bg-teal-200 text-teal-700 rounded-lg transition-colors">
                   <Download className="w-4 h-4" />
                   <span className="text-sm">Export</span>
