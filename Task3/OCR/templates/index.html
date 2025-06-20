@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR & Translation Tool</title>
+    <!-- CSS remains as provided -->
+    <style>
+        /* Your provided CSS is unchanged */
+        {margin: 0;padding: 0;box-sizing: border-box;}body {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);min-height: 100vh;padding: 20px;}.container {max-width: 1400px;margin: 0 auto;background: rgba(255, 255, 255, 0.95);border-radius: 20px;box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);backdrop-filter: blur(10px);overflow: hidden;}.header {background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);color: white;padding: 30px;text-align: center;}.header h1 {font-size: 2.5rem;margin-bottom: 10px;text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);}.header p {font-size: 1.1rem;opacity: 0.9;}.stats {display: flex;justify-content: center;gap: 30px;margin-top: 20px;flex-wrap: wrap;}.stat-item {text-align: center;background: rgba(255, 255, 255, 0.2);padding: 15px 20px;border-radius: 10px;backdrop-filter: blur(5px);}.stat-number {font-size: 2rem;font-weight: bold;display: block;}.stat-label {font-size: 0.9rem;opacity: 0.8;}.main-content {display: grid;grid-template-columns: 1fr 1fr;gap: 30px;padding: 30px;}.section {background: white;border-radius: 15px;padding: 25px;box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);border: 1px solid rgba(0, 0, 0, 0.05);}.section h2 {color: #333;margin-bottom: 20px;font-size: 1.5rem;display: flex;align-items: center;gap: 10px;}.icon {width: 24px;height: 24px;background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius: 50%;display: inline-flex;align-items: center;justify-content: center;color: white;font-size: 12px;}.upload-area {border: 3px dashed #ddd;border-radius: 12px;padding: 40px;text-align: center;transition: all 0.3s ease;background: #fafafa;cursor: pointer;position: relative;overflow: hidden;}.upload-area:hover {border-color: #667eea;background: #f0f4ff;transform: translateY(-2px);}.upload-area.dragover {border-color: #4facfe;background: #e8f4ff;transform: scale(1.02);}.upload-icon {font-size: 3rem;color: #667eea;margin-bottom: 15px;}.upload-text {font-size: 1.1rem;color: #666;margin-bottom: 10px;}.upload-subtext {font-size: 0.9rem;color: #999;}.file-input {display: none;}.form-group {margin-bottom: 20px;}.form-group label {display: block;margin-bottom: 8px;font-weight: 600;color: #333;}.form-control {width: 100%;padding: 12px 15px;border: 2px solid #e0e0e0;border-radius: 8px;font-size: 1rem;transition: all 0.3s ease;background: white;}.form-control:focus {outline: none;border-color: #667eea;box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);}.btn {background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);color: white;padding: 12px 30px;border: none;border-radius: 8px;cursor: pointer;font-size: 1rem;font-weight: 600;transition: all 0.3s ease;display: inline-flex;align-items: center;gap: 8px;text-decoration: none;}.btn:hover {transform: translateY(-2px);box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);}.btn:disabled {opacity: 0.6;cursor: not-allowed;transform: none;}.btn-secondary {background: linear-gradient(135deg, #6c757d 0%, #495057 100%);}.btn-success {background: linear-gradient(135deg, #28a745 0%, #20c997 100%);}.btn-danger {background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);}.result-container {margin-top: 20px;}.result-box {background: #f8f9fa;border: 1px solid #e9ecef;border-radius: 8px;padding: 15px;margin-bottom: 15px;position: relative;}.result-box h4 {color: #495057;margin-bottom: 10px;font-size: 1rem;}.result-text {background: white;border: 1px solid #dee2e6;border-radius: 6px;padding: 12px;min-height: 100px;font-family: 'Courier New', monospace;font-size: 0.9rem;line-height: 1.4;white-space: pre-wrap;word-wrap: break-word;}.language-info {display: flex;gap: 15px;margin-top: 10px;flex-wrap: wrap;}.language-tag {background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);color: white;padding: 4px 12px;border-radius: 20px;font-size: 0.8rem;font-weight: 500;}.loading {display: none;text-align: center;padding: 20px;}.spinner {border: 4px solid #f3f3f3;border-top: 4px solid #667eea;border-radius: 50%;width: 40px;height: 40px;animation: spin 1s linear infinite;margin: 0 auto 15px;}@keyframes spin {0% { transform: rotate(0deg); }100% { transform: rotate(360deg); }}.error {background: #f8d7da;color: #721c24;border: 1px solid #f5c6cb;border-radius: 6px;padding: 12px;margin-top: 15px;}.success {background: #d4edda;color: #155724;border: 1px solid #c3e6cb;border-radius: 6px;padding: 12px;margin-top: 15px;}.tabs {display: flex;border-bottom: 2px solid #e9ecef;margin-bottom: 20px;}.tab {background: none;border: none;padding: 12px 24px;cursor: pointer;font-size: 1rem;color: #6c757d;border-bottom: 3px solid transparent;transition: all 0.3s ease;}.tab.active {color: #667eea;border-bottom-color: #667eea;font-weight: 600;}.tab-content {display: none;}.tab-content.active {display: block;}.text-tools {grid-column: 1 / -1;}.copy-btn {position: absolute;top: 10px;right: 10px;background: #6c757d;color: white;border: none;padding: 5px 10px;border-radius: 4px;font-size: 0.8rem;cursor: pointer;opacity: 0.7;transition: opacity 0.3s ease;}.copy-btn:hover {opacity: 1;}.batch-input {min-height: 120px;resize: vertical;}.batch-results {max-height: 400px;overflow-y: auto;}.batch-item {border-bottom: 1px solid #e9ecef;padding: 15px 0;}.batch-item:last-child {border-bottom: none;}.progress-bar {width: 100%;height: 8px;background: #e9ecef;border-radius: 4px;overflow: hidden;margin: 10px 0;}.progress-fill {height: 100%;background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);width: 0%;transition: width 0.3s ease;}@media (max-width: 768px) {.main-content {grid-template-columns: 1fr;gap: 20px;padding: 20px;}.header h1 {font-size: 2rem;}.stats {gap: 15px;}.stat-item {padding: 10px 15px;}.upload-area {padding: 30px 20px;}.language-info {flex-direction: column;gap: 8px;}}
+    </style>
+</head>
+<body>
+    <!-- Your provided HTML is unchanged -->
+    <div class="container">
+        <div class="header">
+            <h1>🔍 OCR & Translation Tool</h1>
+            <p>Extract text from images and translate to 244+ languages</p>
+            <div class="stats" id="stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalLangs">244+</span>
+                    <span class="stat-label">Languages</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="ocrLangs">100+</span>
+                    <span class="stat-label">OCR Languages</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="indianLangs">20+</span>
+                    <span class="stat-label">Indian Languages</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- OCR Section -->
+            <div class="section">
+                <h2><span class="icon">📷</span>Image OCR & Translation</h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drop an image here or click to browse</div>
+                    <div class="upload-subtext">Supports JPG, PNG, GIF, BMP, TIFF</div>
+                    <input type="file" id="imageInput" class="file-input" accept="image/*">
+                </div>
+
+                <div class="form-group">
+                    <label for="ocrLanguage">OCR Language:</label>
+                    <select id="ocrLanguage" class="form-control">
+                        <option value="auto">Auto Detect (Multi-language)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="targetLanguage">Translate to:</label>
+                    <select id="targetLanguage" class="form-control">
+                        <option value="en">English</option>
+                    </select>
+                </div>
+
+                <button id="processBtn" class="btn" disabled>
+                    <span>🔄</span> Process Image
+                </button>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Processing image...</p>
+                </div>
+
+                <div class="result-container" id="ocrResults"></div>
+            </div>
+
+            <!-- Text Tools Section -->
+            <div class="section text-tools">
+                <h2><span class="icon">🔧</span>Text Tools</h2>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('translate')">Direct Translation</button>
+                    <button class="tab" onclick="switchTab('detect')">Language Detection</button>
+                    <button class="tab" onclick="switchTab('batch')">Batch Translation</button>
+                </div>
+
+                <!-- Direct Translation Tab -->
+                <div class="tab-content active" id="translate-tab">
+                    <div class="form-group">
+                        <label for="inputText">Text to translate:</label>
+                        <textarea id="inputText" class="form-control" rows="4" placeholder="Enter text to translate..."></textarea>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="sourceLanguage">From:</label>
+                            <select id="sourceLanguage" class="form-control">
+                                <option value="auto">Auto Detect</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="translateTargetLanguage">To:</label>
+                            <select id="translateTargetLanguage" class="form-control">
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="translateBtn" class="btn">
+                        <span>🌐</span> Translate
+                    </button>
+                    
+                    <div id="translateResults"></div>
+                </div>
+
+                <!-- Language Detection Tab -->
+                <div class="tab-content" id="detect-tab">
+                    <div class="form-group">
+                        <label for="detectText">Text to analyze:</label>
+                        <textarea id="detectText" class="form-control" rows="4" placeholder="Enter text to detect language..."></textarea>
+                    </div>
+                    
+                    <button id="detectBtn" class="btn">
+                        <span>🔍</span> Detect Language
+                    </button>
+                    
+                    <div id="detectResults"></div>
+                </div>
+
+                <!-- Batch Translation Tab -->
+                <div class="tab-content" id="batch-tab">
+                    <div class="form-group">
+                        <label for="batchTexts">Texts to translate (one per line):</label>
+                        <textarea id="batchTexts" class="form-control batch-input" rows="6" placeholder="Enter multiple texts, one per line..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="batchTargetLanguages">Target Languages (hold Ctrl/Cmd for multiple):</label>
+                        <select id="batchTargetLanguages" class="form-control" multiple>
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="hi">Hindi</option>
+                        </select>
+                    </div>
+                    
+                    <button id="batchTranslateBtn" class="btn">
+                        <span>⚡</span> Batch Translate
+                    </button>
+                    
+                    <div class="progress-bar" id="batchProgress" style="display: none;">
+                        <div class="progress-fill" id="batchProgressFill"></div>
+                    </div>
+                    
+                    <div id="batchResults" class="batch-results"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let languages = {};
+        let ocrLanguages = {};
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLanguages();
+            setupEventListeners();
+        });
+
+        // Load supported languages
+        async function loadLanguages() {
+            try {
+                const response = await fetch('/api/languages');
+                const data = await response.json();
+                
+                languages = data.translation_languages;
+                ocrLanguages = data.ocr_languages;
+                
+                populateLanguageSelects();
+                updateStats(data);
+            } catch (error) {
+                console.error('Error loading languages:', error);
+                showError('Failed to load language data', 'ocrResults');
+            }
+        }
+
+        // Update statistics
+        function updateStats(data) {
+            document.getElementById('totalLangs').textContent = data.total_translation_languages;
+            document.getElementById('ocrLangs').textContent = data.total_ocr_languages;
+            // Fetch language-stats for Indian languages
+            fetch('/language-stats')
+                .then(response => response.json())
+                .then(stats => {
+                    document.getElementById('indianLangs').textContent = stats.indian_languages.count;
+                })
+                .catch(error => console.error('Error fetching language stats:', error));
+        }
+
+        // Populate language select elements
+        function populateLanguageSelects() {
+            const selects = ['targetLanguage', 'sourceLanguage', 'translateTargetLanguage', 'batchTargetLanguages'];
+            
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (!select) return;
+                
+                // Clear existing options (except first one for sourceLanguage)
+                if (selectId === 'sourceLanguage') {
+                    select.innerHTML = '<option value="auto">Auto Detect</option>';
+                } else {
+                    select.innerHTML = '';
+                }
+                
+                // Add language options
+                Object.entries(languages).forEach(([code, name]) => {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = name;
+                    select.appendChild(option);
+                });
+            });
+
+            // Populate OCR language select
+            const ocrSelect = document.getElementById('ocrLanguage');
+            ocrSelect.innerHTML = '<option value="auto">Auto Detect (Multi-language)</option>';
+            Object.entries(ocrLanguages).forEach(([code, name]) => {
+                const option = document.createElement('option');
+                option.value = code;
+                option.textContent = languages[code] || name;
+                ocrSelect.appendChild(option);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            const uploadArea = document.getElementById('uploadArea');
+            const imageInput = document.getElementById('imageInput');
+            const processBtn = document.getElementById('processBtn');
+
+            // File upload handling
+            uploadArea.addEventListener('click', () => imageInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            uploadArea.addEventListener('drop', handleDrop);
+            imageInput.addEventListener('change', handleFileSelect);
+
+            // Process button
+            processBtn.addEventListener('click', processImage);
+
+            // Text tools buttons
+            document.getElementById('translateBtn').addEventListener('click', translateText);
+            document.getElementById('detectBtn').addEventListener('click', detectLanguage);
+            document.getElementById('batchTranslateBtn').addEventListener('click', batchTranslate);
+        }
+
+        // File handling functions
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('imageInput').files = files;
+                handleFileSelect();
+            }
+        }
+
+        function handleFileSelect() {
+            const fileInput = document.getElementById('imageInput');
+            const processBtn = document.getElementById('processBtn');
+            
+            if (fileInput.files && fileInput.files[0]) {
+                processBtn.disabled = false;
+                processBtn.innerHTML = '<span>🔄</span> Process ' + fileInput.files[0].name;
+            }
+        }
+
+        // Process image with OCR
+        async function processImage() {
+            const fileInput = document.getElementById('imageInput');
+            const ocrLanguage = document.getElementById('ocrLanguage').value;
+            const targetLanguage = document.getElementById('targetLanguage').value;
+            const loading = document.getElementById('loading');
+            const resultsDiv = document.getElementById('ocrResults');
+
+            if (!fileInput.files || !fileInput.files[0]) {
+                showError('Please select an image first', 'ocrResults');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            formData.append('ocr_language', ocrLanguage);
+            formData.append('target_language', targetLanguage);
+
+            loading.style.display = 'block';
+            resultsDiv.innerHTML = '';
+
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayOCRResults(data);
+                } else {
+                    showError(data.error || 'Failed to process image', 'ocrResults');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message, 'ocrResults');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Display OCR results
+        function displayOCRResults(data) {
+            const resultsDiv = document.getElementById('ocrResults');
+            
+            const html = `
+                <div class="result-box">
+                    <h4>Extracted Text</h4>
+                    <div class="result-text">${data.extracted_text}</div>
+                    <button class="copy-btn" onclick="copyToClipboard('${data.extracted_text.replace(/'/g, "\\'")}')">Copy</button>
+                    <div class="language-info">
+                        <span class="language-tag">Detected: ${data.detected_language_name}</span>
+                        <span class="language-tag">Confidence: ${data.confidence}</span>
+                        <span class="language-tag">Length: ${data.text_length} chars</span>
+                    </div>
+                </div>
+                ${data.translated_text !== data.extracted_text ? `
+                <div class="result-box">
+                    <h4>Translated Text (${data.target_language_name})</h4>
+                    <div class="result-text">${data.translated_text}</div>
+                    <button class="copy-btn" onclick="copyToClipboard('${data.translated_text.replace(/'/g, "\\'")}')">Copy</button>
+                    <div class="language-info">
+                        <span class="language-tag">Status: ${data.translation_status}</span>
+                    </div>
+                </div>
+                ` : ''}
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        // Translate text directly
+        async function translateText() {
+            const inputText = document.getElementById('inputText').value.trim();
+            const sourceLanguage = document.getElementById('sourceLanguage').value;
+            const targetLanguage = document.getElementById('translateTargetLanguage').value;
+            const resultsDiv = document.getElementById('translateResults');
+
+            if (!inputText) {
+                showError('Please enter text to translate', 'translateResults');
+                return;
+            }
+
+            try {
+                const response = await fetch('/translate-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: inputText,
+                        source_language: sourceLanguage,
+                        target_language: targetLanguage
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const html = `
+                        <div class="result-box">
+                            <h4>Translation Result</h4>
+                            <div class="result-text">${data.translated_text}</div>
+                            <button class="copy-btn" onclick="copyToClipboard('${data.translated_text.replace(/'/g, "\\'")}')">Copy</button>
+                            <div class="language-info">
+                                <span class="language-tag">From: ${data.source_language_name}</span>
+                                <span class="language-tag">To: ${data.target_language_name}</span>
+                            </div>
+                        </div>
+                    `;
+                    resultsDiv.innerHTML = html;
+                } else {
+                    showError(data.error || 'Translation failed', 'translateResults');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message, 'translateResults');
+            }
+        }
+
+        // Detect language
+        async function detectLanguage() {
+            const inputText = document.getElementById('detectText').value.trim();
+            const resultsDiv = document.getElementById('detectResults');
+
+            if (!inputText) {
+                showError('Please enter text to analyze', 'detectResults');
+                return;
+            }
+
+            try {
+                const response = await fetch('/detect-language', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: inputText
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const html = `
+                        <div class="result-box">
+                            <h4>Language Detection Result</h4>
+                            <div class="language-info">
+                                <span class="language-tag">Language: ${data.detected_language_name}</span>
+                                <span class="language-tag">Code: ${data.detected_language}</span>
+                                <span class="language-tag">Confidence: ${data.confidence}</span>
+                                <span class="language-tag">Length: ${data.text_length} chars</span>
+                            </div>
+                        </div>
+                    `;
+                    resultsDiv.innerHTML = html;
+                } else {
+                    showError(data.error || 'Language detection failed', 'detectResults');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message, 'detectResults');
+            }
+        }
+
+        // Batch translate
+        async function batchTranslate() {
+            const batchTexts = document.getElementById('batchTexts').value.trim();
+            const targetLanguages = Array.from(document.getElementById('batchTargetLanguages').selectedOptions).map(opt => opt.value);
+            const resultsDiv = document.getElementById('batchResults');
+            const progressBar = document.getElementById('batchProgress');
+            const progressFill = document.getElementById('batchProgressFill');
+
+            if (!batchTexts) {
+                showError('Please enter texts to translate', 'batchResults');
+                return;
+            }
+
+            if (targetLanguages.length === 0) {
+                showError('Please select at least one target language', 'batchResults');
+                return;
+            }
+
+            const texts = batchTexts.split('\n').filter(text => text.trim());
+            
+            progressBar.style.display = 'block';
+            progressFill.style.width = '0%';
+            resultsDiv.innerHTML = '';
+
+            try {
+                const response = await fetch('/batch-translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        texts: texts,
+                        target_languages: targetLanguages,
+                        source_language: 'auto'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayBatchResults(data.results);
+                    progressFill.style.width = '100%';
+                } else {
+                    showError(data.error || 'Batch translation failed', 'batchResults');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message, 'batchResults');
+            } finally {
+                setTimeout(() => {
+                    progressBar.style.display = 'none';
+                }, 1000);
+            }
+        }
+
+        // Display batch results
+        function displayBatchResults(results) {
+            const resultsDiv = document.getElementById('batchResults');
+            
+            let html = '';
+            results.forEach((result, index) => {
+                let translationsHtml = '';
+                Object.entries(result.translations).forEach(([langCode, translation]) => {
+                    translationsHtml += `
+                        <div class="result-box">
+                            <h4>Translated to ${translation.target_language_name} (${langCode})</h4>
+                            <div class="result-text">${translation.text}</div>
+                            <button class="copy-btn" onclick="copyToClipboard('${translation.text.replace(/'/g, "\\'")}')">Copy</button>
+                            <div class="language-info">
+                                <span class="language-tag">Status: ${translation.status}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                    <div class="batch-item">
+                        <h4>Text ${index + 1}</h4>
+                        <div class="result-box">
+                            <h4>Original Text</h4>
+                            <div class="result-text">${result.original_text}</div>
+                            <button class="copy-btn" onclick="copyToClipboard('${result.original_text.replace(/'/g, "\\'")}')">Copy</button>
+                            <div class="language-info">
+                                <span class="language-tag">Detected: ${result.detected_language_name} (${result.detected_language})</span>
+                            </div>
+                        </div>
+                        ${translationsHtml}
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Copy text to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    const temp = document.createElement('div');
+                    temp.className = 'success';
+                    temp.textContent = 'Text copied to clipboard!';
+                    document.body.appendChild(temp);
+                    setTimeout(() => temp.remove(), 2000);
+                })
+                .catch(err => console.error('Failed to copy text:', err));
+        }
+
+        // Show error message
+        function showError(message, resultDivId = 'ocrResults') {
+            const resultsDiv = document.getElementById(resultDivId);
+            resultsDiv.innerHTML = `<div class="error">${message}</div>`;
+        }
+    </script>
+</body>
+</html>
